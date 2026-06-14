@@ -38,6 +38,11 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/ui/data-table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { TruncatedTooltip } from "@/components/ui/truncated-tooltip";
 import { DEFAULT_TABLE_LIMIT } from "@/consts";
 import {
@@ -490,32 +495,96 @@ function FileStatusBadge({ file }: { file: KnowledgeFile }) {
         : file.processingStatus === "failed"
           ? "Failed"
           : "Queued";
+    const tooltip =
+      file.processingStatus === "failed"
+        ? file.processingError || "The file could not be processed."
+        : undefined;
     return (
-      <Badge
+      <StatusBadge
+        label={label}
+        tooltip={tooltip}
         variant={
           file.processingStatus === "failed" ? "destructive" : "secondary"
         }
-        className="text-xs"
-      >
-        {file.processingStatus === "processing" && (
-          <Loader2 className="h-3 w-3 animate-spin" />
-        )}
-        {label}
-      </Badge>
+        isLoading={file.processingStatus === "processing"}
+      />
     );
   }
 
+  const embeddingLabel = getEmbeddingStatusLabel(file.embeddingStatus);
+  const embeddingTooltip =
+    file.embeddingStatus === "failed"
+      ? getEmbeddingErrorMessage(file.embeddingError)
+      : undefined;
+
   return (
-    <Badge
+    <StatusBadge
+      label={embeddingLabel}
+      tooltip={embeddingTooltip}
       variant={file.embeddingStatus === "failed" ? "destructive" : "secondary"}
-      className="text-xs"
-    >
-      {file.embeddingStatus === "processing" && (
-        <Loader2 className="h-3 w-3 animate-spin" />
-      )}
-      {file.embeddingStatus === "completed" ? "Indexed" : file.embeddingStatus}
+      isLoading={file.embeddingStatus === "processing"}
+    />
+  );
+}
+
+function StatusBadge({
+  label,
+  tooltip,
+  variant,
+  isLoading,
+}: {
+  label: string;
+  tooltip?: string;
+  variant: "secondary" | "destructive";
+  isLoading?: boolean;
+}) {
+  const badge = (
+    <Badge variant={variant} className="text-xs">
+      {isLoading && <Loader2 className="h-3 w-3 animate-spin" />}
+      {label}
     </Badge>
   );
+
+  if (!tooltip) return badge;
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{badge}</TooltipTrigger>
+      <TooltipContent>{tooltip}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+function getEmbeddingErrorMessage(error: KnowledgeFile["embeddingError"]) {
+  switch (error) {
+    case "rate_limit":
+      return "The embedding provider is rate limited. Try again later.";
+    case "authentication":
+      return "The embedding provider rejected the configured API key.";
+    case "model_not_found":
+      return "The configured embedding model could not be found.";
+    case "server_error":
+      return "The embedding provider returned a server error.";
+    case "dimensions_mismatch":
+      return "The embedding dimensions do not match the configured vector store.";
+    case "unsupported_input":
+      return "The configured embedding model does not support this file content.";
+    default:
+      return "The file could not be indexed.";
+  }
+}
+
+function getEmbeddingStatusLabel(status: KnowledgeFile["embeddingStatus"]) {
+  switch (status) {
+    case "completed":
+      return "Indexed";
+    case "processing":
+      return "Indexing";
+    case "failed":
+      return "Failed";
+    default:
+      return "Queued";
+  }
 }
 
 function VisibilityBadge({ file }: { file: KnowledgeFile }) {
