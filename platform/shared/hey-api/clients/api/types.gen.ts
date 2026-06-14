@@ -35849,6 +35849,7 @@ export type GetConnectorDocumentsResponses = {
                 [key: string]: unknown;
             } | null;
             embeddingStatus: 'pending' | 'processing' | 'completed' | 'failed';
+            embeddingError: 'rate_limit' | 'authentication' | 'model_not_found' | 'server_error' | 'dimensions_mismatch' | 'unsupported_input' | 'unknown' | null;
             chunkCount: number;
             createdAt: string;
             updatedAt: string;
@@ -36046,6 +36047,7 @@ export type GetConnectorDocumentResponses = {
             [key: string]: unknown;
         } | null;
         embeddingStatus: 'pending' | 'processing' | 'completed' | 'failed';
+        embeddingError: 'rate_limit' | 'authentication' | 'model_not_found' | 'server_error' | 'dimensions_mismatch' | 'unsupported_input' | 'unknown' | null;
         chunkCount: number;
         createdAt: string;
         updatedAt: string;
@@ -36977,6 +36979,7 @@ export type GetKnowledgeFilesResponses = {
             processingStatus: 'pending' | 'processing' | 'completed' | 'failed';
             processingError: string | null;
             embeddingStatus: 'pending' | 'processing' | 'completed' | 'failed';
+            embeddingError: 'rate_limit' | 'authentication' | 'model_not_found' | 'server_error' | 'dimensions_mismatch' | 'unsupported_input' | 'unknown' | null;
             assignedAgents: Array<{
                 id: string;
                 name: string;
@@ -37270,6 +37273,7 @@ export type GetKnowledgeFileResponses = {
         processingStatus: 'pending' | 'processing' | 'completed' | 'failed';
         processingError: string | null;
         embeddingStatus: 'pending' | 'processing' | 'completed' | 'failed';
+        embeddingError: 'rate_limit' | 'authentication' | 'model_not_found' | 'server_error' | 'dimensions_mismatch' | 'unsupported_input' | 'unknown' | null;
         assignedAgents: Array<{
             id: string;
             name: string;
@@ -37377,6 +37381,7 @@ export type UpdateKnowledgeFileResponses = {
         processingStatus: 'pending' | 'processing' | 'completed' | 'failed';
         processingError: string | null;
         embeddingStatus: 'pending' | 'processing' | 'completed' | 'failed';
+        embeddingError: 'rate_limit' | 'authentication' | 'model_not_found' | 'server_error' | 'dimensions_mismatch' | 'unsupported_input' | 'unknown' | null;
         assignedAgents: Array<{
             id: string;
             name: string;
