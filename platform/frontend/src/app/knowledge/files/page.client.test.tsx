@@ -52,6 +52,7 @@ vi.mock("@/lib/knowledge/knowledge-files.query", () => ({
           processingStatus: "completed",
           processingError: null,
           embeddingStatus: "completed",
+          embeddingError: null,
           visibility: "personal",
           teamIds: [],
           assignedAgents: [
@@ -73,11 +74,27 @@ vi.mock("@/lib/knowledge/knowledge-files.query", () => ({
             },
           ],
         },
+        {
+          id: "file-2",
+          connectorId: "connector-1",
+          originalName: "oversized-vector.md",
+          mimeType: "text/markdown",
+          fileSize: 84,
+          contentHash: "hash-2",
+          createdAt: new Date("2026-01-02T00:00:00Z").toISOString(),
+          processingStatus: "completed",
+          processingError: null,
+          embeddingStatus: "failed",
+          embeddingError: "dimensions_mismatch",
+          visibility: "personal",
+          teamIds: [],
+          assignedAgents: [],
+        },
       ],
       pagination: {
         currentPage: 1,
         limit: 20,
-        total: 1,
+        total: 2,
         totalPages: 1,
         hasNext: false,
         hasPrev: false,
@@ -128,11 +145,26 @@ describe("KnowledgeFilesPage", () => {
     expect(screen.queryByText("Hidden Assistant")).not.toBeInTheDocument();
     expect(screen.queryByText("Hidden Gateway")).not.toBeInTheDocument();
     expect(screen.getByText("Indexed")).toBeInTheDocument();
+    expect(screen.getByText("Failed")).toBeInTheDocument();
     expect(screen.queryByText("42 B")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "View" })).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Download" }),
-    ).toBeInTheDocument();
+      screen.getAllByRole("button", { name: "View" }).length,
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByRole("button", { name: "Download" }).length,
+    ).toBeGreaterThan(0);
+  });
+
+  it("shows a human-readable tooltip for embedding failures", async () => {
+    const user = userEvent.setup();
+    render(<KnowledgeFilesPage />);
+
+    await user.hover(screen.getByText("Failed"));
+
+    const tooltips = await screen.findAllByText(
+      "The embedding dimensions do not match the configured vector store.",
+    );
+    expect(tooltips.length).toBeGreaterThan(0);
   });
 
   it("opens the upload dialog from the create button", async () => {
